@@ -1,0 +1,9 @@
+PATCH http://localhost:3000/62a89eed04712c74b55f7765 HTTP/1.1
+Content-Type: application/json
+
+{
+    "firstName": "Alex",
+    "lastName": "Go",
+    "email": "johnDoe@email.com",
+    "gender": "male"
+}
