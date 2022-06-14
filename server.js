@@ -136,8 +136,12 @@ app.post('/:userId/posts', async (req, res, next) => {
     }
     });
 app.get('/posts', async (req, res, next) => {
+    const {query: {limit, skip}} = req;
     Post
-    .find()
+    .find({}, null, {
+        limit,
+        skip
+    })
     .populate('author')
     .exec(
         (err, posts) => {
@@ -150,6 +154,15 @@ app.get('/posts', async (req, res, next) => {
     });
 
 
+app.get('/:userId/posts', async (req, res, next) => {
+    try {
+    const {params: {userId}} = req;
+    const userPosts = await Post.find({author: userId});
+    res.send(userPosts)
+    } catch(error) {
+        next(error)
+    }
+})
 
 
 /* listening */

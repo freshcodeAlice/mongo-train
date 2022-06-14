@@ -1,1 +1,1 @@
-GET http://localhost:3000/posts HTTP/1.1
+GET http://localhost:3000/posts?limit=2&skip=2 HTTP/1.1
