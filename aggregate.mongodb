@@ -1,0 +1,160 @@
+show collections
+
+db.createCollection('manufacturers', {
+  validator: {
+    $jsonSchema: {
+      bsonType: 'object',
+      required: ['name'],
+      properties: {
+        name: {
+          bsonType: 'string'
+        },
+        address: {
+          bsonType: 'object',
+          required: ['country', 'city'],
+          properties: {
+            country: {
+              bsonType: 'string'
+            },
+            city: {
+              bsonType: 'string'
+            }
+          }
+        }
+      }
+    }
+  }
+})
+
+db.manufacturers.insertMany([{
+  name: "Apple"
+}, {
+  name: "Samsung"
+}, {
+  name: "Nokia"
+}])
+
+
+///////
+
+
+db.createCollection('products', {
+  validator: {
+    $jsonSchema: {
+      required: ['name', 'manufacturerId', 'price', 'amount'],
+      properties: {
+        name: {
+          bsonType: 'string'
+        },
+        manufacturerId: {
+          bsonType: "objectId"
+        }, 
+        price: {
+          bsonType: 'double'
+        },
+        amount: {
+          bsonType: 'int'
+        }
+      }
+    }
+  }
+})
+
+db.products.insertMany([{
+name: 'iphone',
+manufacturerId: new ObjectId('62a8aa1ab28bfa07a8cb2536'),
+price: 23445.9432,
+amount: 3
+}, {
+name: 'ipad',
+manufacturerId: new ObjectId('62a8aa1ab28bfa07a8cb2536'),
+price: 23445.9432,
+amount: 3
+}, {
+name: 's10',
+manufacturerId: new ObjectId('62a8aa1ab28bfa07a8cb2537'),
+price: 23445.9432,
+amount: 3
+}, {
+name: 's20',
+manufacturerId: new ObjectId('62a8aa1ab28bfa07a8cb2537'),
+price: 23445.9432,
+amount: 3
+}, {
+name: '2110',
+manufacturerId: new ObjectId('62a8aa1ab28bfa07a8cb2538'),
+price: 23445.9432,
+amount: 3
+}, {
+name: 'magicPhone',
+manufacturerId: new ObjectId('62a8aa1ab28bfa07a8cb2538'),
+price: 23445.9432,
+amount: 3
+}])
+
+
+////
+
+
+db.products.aggregate([
+{
+  
+  $lookup: {
+    from: 'manufacturers',
+    localField: 'manufacturerId',
+    foreignField: '_id',
+    as: 'manufacturer'
+  }
+},
+{
+  $unwind: "$manufacturer"
+},
+{ $unset: "manufacturerId"}
+])
+
+
+////
+
+
+db.products.aggregate([
+  {
+  
+  $lookup: {
+    from: 'manufacturers',
+    localField: 'manufacturerId',
+    foreignField: '_id',
+    as: 'manufacturer'
+  }
+},
+  {
+    $group: {
+      _id: "$manufacturer.name",
+      countPositions: {
+        $sum: 1
+      }
+    }
+  }
+])
+
+
+////
+
+
+db.products.aggregate([
+  {
+    $sort: {
+      price: -1,
+      amount: 1
+    }
+  },
+  {
+   
+    $limit: 6
+  }
+])
+
+
+////
+// easy pagination
+
+db.products.find().skip(2).limit(3)
