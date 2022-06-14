@@ -50,6 +50,28 @@ const User = mongoose.model('User', userSchema);
 
 
 
+const postSchema = new Schema({
+    body: {
+        type: String,
+        required: true
+    },
+    imgSrc: String,
+    author:{ 
+        type: Schema.Types.ObjectId, 
+        ref: 'users' 
+    }
+});
+
+const Post = mongoose.model('Post', postSchema)
+
+
+
+
+
+
+
+
+
 /* routes */
 
 app.use(express.json());
