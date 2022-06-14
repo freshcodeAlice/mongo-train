@@ -58,7 +58,7 @@ const postSchema = new Schema({
     imgSrc: String,
     author:{ 
         type: Schema.Types.ObjectId, 
-        ref: 'users' 
+        ref: 'User' 
     }
 });
 
@@ -76,7 +76,10 @@ const Post = mongoose.model('Post', postSchema)
 
 app.use(express.json());
 
-app.post('/', async (req, res, next) => {
+
+/* CRUD users */
+
+app.post('/users/', async (req, res, next) => {
 try {
     const {body} = req;
    const createdUser = await User.create(body);
@@ -86,8 +89,7 @@ try {
 }
 });
 
-
-app.get('/', async (req, res, next) => {
+app.get('/users/', async (req, res, next) => {
     try {
    const users = await User.find();
    res.send(users)
@@ -96,7 +98,7 @@ app.get('/', async (req, res, next) => {
     }
 });
 
-app.patch('/:userId', async (req, res, next) => {
+app.patch('/users/:userId', async (req, res, next) => {
     try {
    const {body, params: {userId}} = req;
   const updatedUser = await User.findOneAndUpdate({_id: userId}, body, {
@@ -108,7 +110,7 @@ app.patch('/:userId', async (req, res, next) => {
     }
     });
 
-app.delete('/:userId', async (req, res, next) => {
+app.delete('/users/:userId', async (req, res, next) => {
     try {
         const {params: {userId}}= req;
      const deletedUser = await User.findByIdAndDelete(userId);
@@ -120,6 +122,34 @@ app.delete('/:userId', async (req, res, next) => {
         next(error);
     }
     });
+
+/* CRUD posts */
+
+
+app.post('/:userId/posts', async (req, res, next) => {
+    try {
+      const {params: {userId}, body} = req;
+      const createdPost = await Post.create({...body, author: userId})
+      res.send(createdPost)
+    } catch(error) {
+        next(error);
+    }
+    });
+app.get('/posts', async (req, res, next) => {
+    Post
+    .find()
+    .populate('author')
+    .exec(
+        (err, posts) => {
+            if (err) {
+                throw err
+            }
+            res.send(posts)
+        }
+    )
+    });
+
+
 
 
 /* listening */
