@@ -1,0 +1,63 @@
+db.messages.drop()
+
+
+db.createCollection('messages', {
+    validator: {
+        $jsonSchema: {
+            bsonType: 'object',
+            required: ['body'],
+            properties: {
+                body: {
+                    bsonType: 'string'
+                },
+                created_at: {
+                    bsonType: 'date'
+                }
+            }
+        }
+    }
+})
+
+
+db.messages.insertMany([
+    {
+        body: 'Super-watermelon',
+    },
+    {
+        body: 'Is water in the melon?',
+    },
+        {
+        body: 'Just text',
+    },
+        {
+        body: 'Just text, without any watermelons',
+    },
+        {
+        body: 'Test',
+    },
+        {
+        body: 'Watermelon',
+    },
+    ])
+
+
+    db.messages.find({
+        {body: /watermelon/i},
+    })
+
+    db.messages.aggregate([
+    {$match: { body: /watermelon/i }},
+       {$group: {
+        _id: "body",
+        totalCount: {
+            $sum: 1
+            }
+        }
+      }
+])
+
+
+
+    db.messages.find(
+        {body: /^.{2,10}$/}
+    )
